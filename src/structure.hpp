@@ -15,29 +15,29 @@ enum OPERATIONS {
 typedef struct _Node { } Node;
 
 typedef struct _Conc : public Node {
-	Node * right,left;
+	Node * right, *left;
 	~_Conc(){
-		delete *right;
-		delete *left;
+		delete right;
+		delete left;
 	}
 } Conc;
 typedef struct _Union : public Node {
-	Node * right,left;
+	Node * right, * left;
 	~_Union(){
-		delete *right;
-		delete *left;
+		delete right;
+		delete left;
 	}
 } Union;
 typedef struct _Star : public Node {
 	Node * star;
 	~_Star(){
-		delete *star;
+		delete star;
 	}
 } Star;
 typedef struct _Un : public Node {
 	Node * un;
-	~_Star(){
-		delete *un;
+	~_Un(){
+		delete un;
 	}
 } Un;
 
@@ -48,6 +48,9 @@ typedef struct _Atom{
 
 typedef Node * grammaire;
 
-
+Conc * Concatenation(){
+	Conc * c = new Conc;
+	return c;
+} 
 
 #endif
