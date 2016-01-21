@@ -41,16 +41,12 @@ typedef struct _Un : public Node {
 	}
 } Un;
 
-typedef struct _Atom{
+typedef struct _Atom : public Node{
 	int code,action;
 	ATOMETYPES type;
 } Atom;
 
 typedef Node * grammaire;
 
-Conc * Concatenation(){
-	Conc * c = new Conc;
-	return c;
-} 
 
 #endif
