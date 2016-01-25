@@ -1,5 +1,6 @@
 #include "structure.hpp"
 #include <iostream>
+#include <string>
 
 Conc* GConc(Node* left, Node* right) {
 	Conc * conc = new Conc;
@@ -23,7 +24,7 @@ Un * GUN(Node* ptr) {
 	nun->un = ptr;
 	return nun;
 }
-Atom * GAtom(int code, int action, ATOMETYPES type) {
+Atom * GAtom(std::string code, int action, ATOMETYPES type) {
 	Atom * patom = new Atom;
 	patom->code = code;
 	patom->action = action;
@@ -39,48 +40,96 @@ grammaire * Gforet(){
 					GConc(
 						GConc(
 							GConc(
-								GAtom(78,0,NonTerminal),
-								GAtom(62,0,Terminal)
+								GAtom("N",0,NonTerminal),
+								GAtom("->",0,Terminal)
 							),
-							GAtom(static_cast<int>('E'),0,NonTerminal)
+							GAtom("E",0,NonTerminal)
 						),
-						GAtom(44,0,Terminal)
+						GAtom(",",0,Terminal)
 					)
 				),
-				GAtom(59,0,Terminal)
+				GAtom(";",0,Terminal)
 			);
-	g[1] = GAtom(0,0,Terminal); // IDNTER 0 et ELTER 1
-	g[2] = GConc(GAtom(84,0,NonTerminal),GStar(GConc(GAtom(43,0,Terminal),GAtom(84,0,NonTerminal))));
-	g[3] = GConc(GAtom(70,0,NonTerminal),GStar(GConc(GAtom(46,0,Terminal),GAtom(70,0,NonTerminal))));
+	g[1] = GAtom("IDNTER",0,Terminal); // IDNTER 0 et ELTER 1
+	g[2] = GConc(GAtom("T",0,NonTerminal),GStar(GConc(GAtom("+",0,Terminal),GAtom("T",0,NonTerminal))));
+	g[3] = GConc(GAtom("F",0,NonTerminal),GStar(GConc(GAtom(".",0,Terminal),GAtom("F",0,NonTerminal))));
 	g[4] = GUnion(GUnion(GUnion(
-							GUnion(GAtom(0,0,Terminal),GAtom(1,0,Terminal)
+							GUnion(GAtom("IDNTER",0,Terminal),GAtom("ELTER",0,Terminal)
 							),
 							GConc(
-								GAtom(static_cast<int>('('),0,Terminal),
-								GConc(GAtom(static_cast<int>('E'),0,NonTerminal),GAtom(static_cast<int>(')'),0,Terminal))
+								GAtom("(",0,Terminal),
+								GConc(GAtom("E",0,NonTerminal),GAtom(")",0,Terminal))
 								)
 						),
 						GConc(
-								GAtom(static_cast<int>('['),0,Terminal),
-								GConc(GAtom(static_cast<int>('E'),0,NonTerminal),GAtom(static_cast<int>(']'),0,Terminal))
+								GAtom("[",0,Terminal),
+								GConc(GAtom("E",0,NonTerminal),GAtom("]",0,Terminal))
 								)
 				),
 				GConc(
-					GAtom(1000,0,Terminal),
-					GConc(GAtom(static_cast<int>('E'),0,NonTerminal),GAtom(1001,0,Terminal))
+					GAtom("(/",0,Terminal),
+					GConc(GAtom("E",0,NonTerminal),GAtom("/)",0,Terminal))
 				)
 			); 
-	/** 
-	 * 1000 = '(/'
-	 * 1001 = '/)'
-	 */
 	
 	return g;
 }
 
+void printGrammaire(Node * ptr,int prof){
+	int va = 1;
+	prof++;
+	for(int i = 0;i<prof;i++){
+		std::cout << "---";
+	}
+	Conc * tmp_conc =  static_cast<Conc*>(ptr);
+	Star * tmp_star =  static_cast<Star*>(ptr);
+	Union * tmp_union =  static_cast<Union*>(ptr);
+	Un * tmp_un =  static_cast<Un*>(ptr);
+	Atom * tmp_atom =  static_cast<Atom*>(ptr);
+	switch(ptr->classname){
+			case CONC :
+				std::cout << ">CONC" << std::endl;
+				
+				printGrammaire(tmp_conc->left,prof);
+				printGrammaire(tmp_conc->right,prof);
+				break;
+			case STAR :
+				
+				std::cout << ">STAR" << std::endl;
+				printGrammaire(tmp_star->star,prof);
+				break;
+			case UNION :
+				
+				std::cout << ">UNION" << std::endl;
+				printGrammaire(tmp_union->left,prof);
+				printGrammaire(tmp_union->right,prof);
+				break;
+			case ATOM :
+				std::cout << tmp_atom->code << std::endl;
+				break;
+			case UN :
+				
+				std::cout << ">UN" << std::endl;
+				printGrammaire(tmp_un->un,prof);
+				break;
+			default :
+				std::cout << "PROBLEM" << std::endl;
+	}
+}
+
 int main(){
-	
-	
+	grammaire * g = Gforet();
+	std::cout<<" ------------------------------------ " << std::endl;
+	printGrammaire(g[0],0);
+	std::cout<<" ------------------------------------ " << std::endl;
+	printGrammaire(g[1],0);
+	std::cout<<" ------------------------------------ " << std::endl;
+	printGrammaire(g[2],0);
+	std::cout<<" ------------------------------------ " << std::endl;
+	printGrammaire(g[3],0);
+	std::cout<<" ------------------------------------ " << std::endl;
+	printGrammaire(g[4],0);
+	std::cout<<" ------------------------------------ " << std::endl;
 	return 0;
 }
 
