@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+
+#include <vector>
 enum ATOMETYPES{
 	Terminal,
 	NonTerminal
@@ -15,6 +17,16 @@ enum OPERATIONS {
 typedef struct _Node {
 		OPERATIONS classname;
 } Node;
+
+
+typedef struct _scan_struct{
+	int scan_position_row,scan_position_col;
+	std::string scan_code;
+	int scan_action;
+	ATOMETYPES scan_type;
+	std::string scan_token;
+}scan_struct;
+extern scan_struct * scanner = NULL;
 
 typedef struct _Conc :  Node {
 	Node * right, *left;
@@ -57,6 +69,7 @@ typedef struct _Un :  Node {
 
 typedef struct _Atom :  Node{
 	std::string code;
+	int i_code;
 	int action;
 	ATOMETYPES type;
 	_Atom(){
@@ -66,9 +79,18 @@ typedef struct _Atom :  Node{
 
 typedef Node * grammaire;
 
+typedef struct Arbre{
+		grammaire * g;
+		std::vector<Node *> gpl;
+}Arbre;
+extern Arbre * arbre = NULL;
+
+void scan();
+void DoAction(int);
+bool Analyse(Node *);
 void printGrammaire();
 grammaire * Gforet(Node * ptr,int prof);
-Atom * GAtom(std::string code, int action, ATOMETYPES type);
+Atom * GAtom(std::string code, int action, ATOMETYPES type,int i_code);
 Un * GUN(Node* ptr);
 Star * GStar(Node* ptr);
 Union* GUnion(Node* left, Node* right);
