@@ -19,14 +19,6 @@ typedef struct _Node {
 } Node;
 
 
-typedef struct _scan_struct{
-	int scan_position_row,scan_position_col;
-	std::string scan_code;
-	int scan_action;
-	ATOMETYPES scan_type;
-	std::string scan_token;
-}scan_struct;
-extern scan_struct * scanner = NULL;
 
 typedef struct _Conc :  Node {
 	Node * right, *left;
@@ -85,7 +77,19 @@ typedef struct Arbre{
 }Arbre;
 extern Arbre * arbre = NULL;
 
-void scan();
+typedef struct _scan_struct{
+	std::vector< std::vector<std::string> > grammar_split;
+	int scan_position_row,scan_position_col;
+	std::string scan_code;
+	int scan_action;
+	ATOMETYPES scan_type;
+	std::string scan_token;
+}scan_struct;
+extern scan_struct * scanner = NULL;
+
+void parseToken(std::string);
+void scan(void);
+void readFile(std::string);
 void DoAction(int);
 bool Analyse(Node *);
 void printGrammaire();
