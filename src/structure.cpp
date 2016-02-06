@@ -377,7 +377,13 @@ int main(){
 	//NOW WE CAN ANALYSE THE GRAMMAR TO KNOW HOW IT'S WELL-FORMATTED
 	bool analyse = Analyse(arbre->g[0]);
 	std::string str_analyse = (analyse)?"true":"false";
-	std::cout << "[GRAMMAR STATUS] : " << str_analyse << std::endl;
-
+	std::cout << "[GRAMMAR STATUS Number:"<< scanner->scan_position_row <<"] : " << str_analyse << std::endl;
+	for(int i=1;i<scanner->grammar_split.size();i++){
+		analyse = analyse && Analyse(arbre->g[0]);
+		str_analyse = (analyse)?"true":"false";
+		std::cout << "[GRAMMAR STATUS Number:"<< scanner->scan_position_row <<"] : " << str_analyse << std::endl;
+	}
+	str_analyse = (analyse)?"true":"false";
+	std::cout << "[GRAMMAR STATUS TOTAL] : " << str_analyse << std::endl;
 	return 0;
 }

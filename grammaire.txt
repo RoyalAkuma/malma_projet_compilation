@@ -1,1 +1,3 @@
 A -> ( B . 'C' ) . ( [ 'D' ] + [ 'E#22' ] ) ;
+B -> 'C' + D ;
+D -> 'jaimeleschoux' ;
