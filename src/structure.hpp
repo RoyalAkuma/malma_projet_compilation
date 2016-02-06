@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-
 #include <vector>
 enum ATOMETYPES{
 	Terminal,
@@ -17,8 +16,6 @@ enum OPERATIONS {
 typedef struct _Node {
 		OPERATIONS classname;
 } Node;
-
-
 
 typedef struct _Conc :  Node {
 	Node * right, *left;
@@ -75,7 +72,6 @@ typedef struct Arbre{
 		grammaire * g;
 		std::vector<Node *> gpl;
 }Arbre;
-extern Arbre * arbre = NULL;
 
 typedef struct _scan_struct{
 	std::vector< std::vector<std::string> > grammar_split;
@@ -85,20 +81,26 @@ typedef struct _scan_struct{
 	ATOMETYPES scan_type;
 	std::string scan_token;
 }scan_struct;
-extern scan_struct * scanner = NULL;
 
-void parseToken(std::string);
-void scan(void);
+Arbre * arbre = NULL;
+std::vector<std::string> symbole_table;
+scan_struct * scanner = NULL;
+std::string profon = "";
+
+
+void loadSymbole(void);
 void readFile(std::string);
-void DoAction(int);
-bool Analyse(Node *);
-void printGrammaire();
-grammaire * Gforet(Node * ptr,int prof);
+void printGrammaire(Node *,int);
+grammaire * Gforet();
 Atom * GAtom(std::string code, int action, ATOMETYPES type,int i_code);
 Un * GUN(Node* ptr);
 Star * GStar(Node* ptr);
 Union* GUnion(Node* left, Node* right);
 Conc* GConc(Node* left, Node* right);
-
+void remove_all_chars(char* str, char c);
+void parseToken(std::string);
+void scan(void);
+void DoAction(int);
+bool Analyse(Node *);
 
 #endif

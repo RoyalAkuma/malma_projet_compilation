@@ -35,7 +35,26 @@ Atom * GAtom(std::string code, int action, ATOMETYPES type,int i_code) {
 	patom->i_code = i_code;
 	return patom;
 }
-
+void loadSymbole(void){
+	symbole_table.push_back("N");
+	symbole_table.push_back("S");
+	symbole_table.push_back("E");
+	symbole_table.push_back("T");
+	symbole_table.push_back("F");
+	symbole_table.push_back(",");
+	symbole_table.push_back("->");
+	symbole_table.push_back("(");
+	symbole_table.push_back(")");
+	symbole_table.push_back("[");
+	symbole_table.push_back("]");
+	symbole_table.push_back("(/");
+	symbole_table.push_back("/)");
+	symbole_table.push_back("+");
+	symbole_table.push_back(".");
+	symbole_table.push_back("IDNTER");
+	symbole_table.push_back("ELTER");
+	symbole_table.push_back(";");
+}
 grammaire * Gforet(){
 	grammaire * g = new grammaire[5]; 
 	// 78 = 'N' ; 62 = '>' ; 69 = 'E' ; 44 = ',' ; 59 =';' 46 = '.' ; 70 = 'F'
@@ -121,13 +140,12 @@ void printGrammaire(Node * ptr,int prof){
 	}
 }
 
-std::string profon = "";
-//FAIRE L'ANALYSE SUR UNE STRUCTURE !!
 bool Analyse(Node * node){
 	profon += "-";
-	std::cout <<profon << "BEGINANALYSE:"<< scanner->scan_token << "-"<< scanner->scan_type  << "-" << scanner->scan_code<< std::endl; 
+	std::cout <<profon << "BEGINANALYSE("<< scanner->scan_token << " "<< scanner->scan_type  << " " << scanner->scan_code<< ")" << std::endl; 
 	bool analyse = false;
-
+	bool ana_tmp = false;
+	bool ok;
 	Conc * tmp_conc =  static_cast<Conc*>(node);
 	Star * tmp_star =  static_cast<Star*>(node);
 	Union * tmp_union =  static_cast<Union*>(node);
@@ -164,30 +182,38 @@ bool Analyse(Node * node){
 			//std::cout<<")";
 			break;
 		case ATOM:
-			std::cout << profon << "ATOM";
-			//std::cout<<"ATOM:(";
+			//if(tmp_atom->type == Terminal)
+			//	std::cout << profon << "ATOM[TYPE:TERMINAL";
+			//else
+			//	std::cout << profon << "ATOM[TYPE:NONTERMINAL";
+			//std::cout<<","<<tmp_atom->code << "," << tmp_atom->action;
 			switch(tmp_atom->type){
 				case Terminal:
 					// AVOIR FAIT SCAN AVANT L'APPEL DE ANALYSE
-
-					if(tmp_atom->code == scanner->scan_code){
-						std::cout << tmp_atom->code;
+					//std::cout << "tmp_atomCode:" << tmp_atom->code << " scan_Code:"<< scanner->scan_code <<"sizeToken" << scanner->scan_token.size(); 
+					if( scanner->scan_code==tmp_atom->code){
+						//std::cout << tmp_atom->code <<"]";
 						analyse=true;
 						if(tmp_atom->action != 0){
 							DoAction(tmp_atom->action);
 						}
 						scan(); //ON CONTINUE SUR LA TETE DE LECTURE
-					}
+					}//else
+						//std::cout<<"CODEFAUXAVEC:ATOM="<< tmp_atom->code<<" TOKEN="<<scanner->scan_token<<" " << scanner->scan_type << " " << scanner->scan_code;
 					break;
 				case NonTerminal:
-			//		std::cout << "i_code:" << tmp_atom->i_code << ":";
-					if(Analyse(arbre->g[tmp_atom->i_code])){
+			//		
+					ana_tmp = Analyse(arbre->g[tmp_atom->i_code]);
+					//std::cout <<"NONTERMINAL"<<std::endl;
+					//std::cout <<  tmp_atom->code<<"-icode="<< tmp_atom->i_code << "]";
+					if(ana_tmp){
+						//std::cout << "ANANANANANANAN";
 						analyse = true;
 						if(tmp_atom->action != 0){
 								DoAction(tmp_atom->action);
 								
 						}
-						scan(); //ON CONTINUE SUR LA TETE DE LECTURE
+						//scan(); //ON CONTINUE SUR LA TETE DE LECTURE
 					}
 					break;
 				default:
@@ -201,10 +227,8 @@ bool Analyse(Node * node){
 			std::cout<<"DEFAULT=PROBLEM WHEN ANALYSE";
 			analyse = false;
 	}
-	if(analyse)
-		std::cout<<profon<<"ANALYSE=true"<<std::endl;
-	else
-		std::cout<<profon<<"ANALYSE=false"<<std::endl;
+	std::string a = (analyse)?"true":"false";
+	std::cout<< profon << a  << std::endl;
 	profon = profon.substr(0, profon.size()-1);;
 	return analyse;
 }
@@ -246,6 +270,15 @@ void readFile(std::string path){
 		std::cout << "-> END OF READING FILE..." << std::endl;
 }
 
+void remove_all_chars(char* str, char c) {
+    char *pr = str, *pw = str;
+    while (*pr) {
+        *pw = *pr++;
+        pw += (*pw != c);
+    }
+    *pw = '\0';
+}
+
 void parseToken(std::string token){
 	//std::cout << "------> PARSING TOKEN : " << token << std::endl;
 	std::vector<std::string> parse_token_quote = split(token,((char)39));
@@ -267,14 +300,19 @@ void parseToken(std::string token){
 		}*/
 	}else if(parse_token_quote.size()==1){
 		scanner->scan_token = parse_token_quote[0];
-		scanner->scan_code = "IDNTER";
+		if(std::find(symbole_table.begin(),symbole_table.end(),parse_token_quote[0]) != symbole_table.end()){
+			scanner->scan_code = parse_token_quote[0];
+		}else{
+			scanner->scan_code = "IDNTER";
+		}
+		
 		scanner->scan_type=NonTerminal;
 		scanner->scan_action=0;
 	}else{
 		std::cout << "NOT WELL-FORMATTED" << std::endl;
 	}
 
-	for(int i=0;i<parse_token_quote.size();i++){
+	/*for(int i=0;i<parse_token_quote.size();i++){
 		std::cout << "\n|--> QUOTE PARSING  : " << parse_token_quote[i] << std::endl;	
 	}
 	std::cout << "==CODE:" << scanner->scan_code <<std::endl;
@@ -282,7 +320,7 @@ void parseToken(std::string token){
 	std::cout << "==TOKEN:" << scanner->scan_token <<std::endl;
 	std::cout << "==ACTION:"<< scanner->scan_action <<std::endl;
 	std::cout << "==profon: "<< profon.size() << std::endl;
-	
+	*/
 
 	
 	
@@ -295,7 +333,7 @@ void scan(void){
 		//std::cout << "-> SCAN NEXT TOKEN : " << scanner->scan_token<< std::endl;
 		//PARSE THE TOKEN TO HAVE ACTION_CODE AND KNOW TERMINAL
 		parseToken(scanner->scan_token);
-		scanner->grammar_split[scanner->scan_position_row][scanner->scan_position_col].erase(0);
+		//scanner->grammar_split[scanner->scan_position_row][scanner->scan_position_col].erase(0);
 		scanner->scan_position_col++;
 
 		if(scanner->scan_position_col == scanner->grammar_split[scanner->scan_position_row].size()){
@@ -310,6 +348,7 @@ void DoAction(int code_action){
 } 
 
 int main(){
+	loadSymbole();
 	arbre = new Arbre;
 	arbre->g = Gforet();
 	std::cout<<" ------------------------------------ " << std::endl;
@@ -332,16 +371,13 @@ int main(){
 	//FIRSTLY WE HAVE TO READ THE FIRST TOKEN;
 	//for(int i =0;i<10;i++){
 	//	std::cout << std::endl;
-		scan();
+	scan();
 
 	//}
 	//NOW WE CAN ANALYSE THE GRAMMAR TO KNOW HOW IT'S WELL-FORMATTED
 	bool analyse = Analyse(arbre->g[0]);
-	std::cout << "[GRAMMAR STATUS] : " << analyse << std::endl;
+	std::string str_analyse = (analyse)?"true":"false";
+	std::cout << "[GRAMMAR STATUS] : " << str_analyse << std::endl;
 
-
-	
 	return 0;
 }
-
-
